@@ -9,6 +9,8 @@ DB_PASSWORD="$5"
 BATCH_SIZE="$6"
 EXPORT_FILE="$7"
 
+export MYSQL_PWD="$DB_PASSWORD"
+
 # Display configuration
 echo "DB_SERVER: ${DB_HOST}:${DB_PORT}"
 echo "DB_NAME: $DB_NAME"
@@ -31,7 +33,7 @@ echo "Fetching tenant IDs and organization UUIDs from MySQL database..."
 RAW_OUTPUT="/tmp/raw_output.log"
 
 # Execute the query and capture output in a raw format
-mysql -h "$DB_HOST" -P "$DB_PORT" -D "$DB_NAME" -u "$DB_USER" -p"$DB_PASSWORD" -e "$FETCH_QUERY" --batch --silent -r 2>error.log > "$RAW_OUTPUT"
+mysql -h "$DB_HOST" -P "$DB_PORT" -D "$DB_NAME" -u "$DB_USER" -e "$FETCH_QUERY" --batch --silent -r 2>error.log > "$RAW_OUTPUT"
 
 # Check for errors
 if [[ $? -ne 0 ]]; then
@@ -70,3 +72,6 @@ if [[ $(wc -l < "$EXPORT_FILE") -le 1 ]]; then
 else
   echo "Data exported to $EXPORT_FILE successfully in CSV format."
 fi
+
+# Unset MYSQL_PWD to avoid leaving it in the environment.
+unset MYSQL_PWD
